@@ -1,7 +1,18 @@
 import "@typespec/http";
 import "@typespec/openapi";
 import "@typespec/openapi3";
-import "./models.tsp";
+import "./models/afterService.tsp";
+import "./models/car.tsp";
+import "./models/choice.tsp";
+import "./models/cost.tsp";
+import "./models/image.tsp";
+import "./models/metadata.tsp";
+import "./models/price.tsp";
+import "./models/registration.tsp";
+import "./models/repairHistory.tsp";
+import "./models/website.tsp";
+import "./parameters.tsp";
+import "./uuid.tsp";
 
 using Http;
 using OpenAPI;
@@ -18,39 +29,12 @@ using OpenAPI;
 })
 namespace KeizWebAPI;
 
-
-/**
- * Get cars
- */
-@tag("car")
 @route("/cars")
-@get
-@summary("Get Cars")
-op getCars(
-  /**
-   * Recommended
-   */
-  @query(#{ explode: true }) recommended?: boolean,
-): Body<Car[]> | BadRequestResponse | {
-  @statusCode statusCode: 500;
-};
+namespace Cars {
+  @get
+  op getCars(@query(#{ explode: true }) recommended?: boolean): OkResponse &
+    Body<Car[]>;
 
-/**
- * Get a car
- */
-@tag("car")
-@route("/cars/{carId}")
-@get
-@summary("Get Car")
-op getCar(...Parameters.carId): Car | NotFoundResponse | {
-  @statusCode statusCode: 500;
-};
-
-namespace Parameters {
-  model carId {
-    /**
-     * Car ID
-     */
-    @format("uuid") @path carId: string;
-  }
+  @get
+  op getCar(...Parameters.carId): (OkResponse & Car) | NotFoundResponse;
 }

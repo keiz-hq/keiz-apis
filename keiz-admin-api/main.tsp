@@ -1,7 +1,18 @@
 import "@typespec/http";
 import "@typespec/openapi";
-import "@typespec/openapi3";
-import "./models.tsp";
+import "./models/afterService.tsp";
+import "./models/attribute.tsp";
+import "./models/car.tsp";
+import "./models/choice.tsp";
+import "./models/cost.tsp";
+import "./models/image.tsp";
+import "./models/metadata.tsp";
+import "./models/price.tsp";
+import "./models/registration.tsp";
+import "./models/repairHistory.tsp";
+import "./models/website.tsp";
+import "./parameters.tsp";
+import "./uuid.tsp";
 
 using Http;
 using OpenAPI;
@@ -14,400 +25,178 @@ using OpenAPI;
     url: "https://ag-keiz.com",
     email: "hq@ag-keiz.com",
   },
-  license: #{ name: "All Rights Reserved", url: "https://ag-keiz.com" },
+  license: #{
+    name: "Copyright © 2025 Keiz! Co., Ltd. All rights reserved.",
+    url: "https://ag-keiz.com",
+  },
 })
+@server("https://api.admin.ag-keiz.com", "Production")
+@server("https://stg.api.admin.ag-keiz.com", "Staging")
+@server("https://dev.api.admin.ag-keiz.com", "Development")
+@server("http://localhost:8080", "Local")
+@useAuth(BearerAuth)
 namespace KeizAdminAPI;
 
-/**
- * Get cars
- */
-@tag("car")
 @route("/cars")
-@get
-@summary("Get Cars")
-op getCars(
-  /**
-   * Filter
-   */
-  @query(#{ explode: true }) filter?: "lined_up" | "recommended",
-): Body<Car[]> | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+namespace Cars {
+  @get
+  op listCars(
+    @query(#{ explode: true }) filter?: "lined_up" | "recommended",
+  ): (OkResponse & Body<Car[]>) | UnauthorizedResponse;
 
-/**
- * Create a car
- */
-@tag("car")
-@route("/cars")
-@post
-@summary("Create Car")
-op createCar(@body body: CreateCar): (CreatedResponse &
-  Car) | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+  @get
+  op getCar(...Parameters.carId): (OkResponse &
+    Body<Car>) | NotFoundResponse | UnauthorizedResponse;
 
-/**
- * Delete a car
- */
-@tag("car")
-@route("/cars/{carId}")
-@delete
-@summary("Delete Car")
-op deleteCar(...Parameters.carId):
-  | NoContentResponse
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+  @post
+  op createCar(@body body: CreateCar): (CreatedResponse &
+    Body<Car>) | BadRequestResponse;
 
-/**
- * Get a car
- */
-@tag("car")
-@route("/cars/{carId}")
-@get
-@summary("Get Car")
-op getCar(...Parameters.carId):
-  | Car
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+  @patch(#{ implicitOptionality: true })
+  op updateCar(...Parameters.carId, @body body: UpdateCar):
+    | (OkResponse & Body<Car>)
+    | NotFoundResponse
+    | BadRequestResponse
+    | UnauthorizedResponse;
 
-/**
- * Update a car
- */
-@tag("car")
-@route("/cars/{carId}")
-@patch
-@summary("Update Car")
-op updateCar(...Parameters.carId, @body body: UpdateCar):
-  | Car
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+  @delete
+  op deleteCar(
+    ...Parameters.carId,
+  ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
 
-/**
- * Get images
- */
-@tag("image")
-@route("/cars/{carId}/images")
-@get
-@summary("Get Images")
-op getImages(...Parameters.carId): Body<Image[]> | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+  @route("/{carId}/images")
+  namespace Images {
+    @get
+    op listImages(...Parameters.carId): (OkResponse &
+      Body<Image[]>) | UnauthorizedResponse;
 
-/**
- * Create a image
- */
-@tag("image")
-@route("/cars/{carId}/images")
-@post
-@summary("Create Image")
-op createImage(...Parameters.carId, @body body: CreateImage): (CreatedResponse &
-  Image) | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+    @get
+    op getImage(...Parameters.carId, ...Parameters.imageId): (OkResponse &
+      Body<Image>) | NotFoundResponse | UnauthorizedResponse;
 
-/**
- * Delete a image
- */
-@tag("image")
-@route("/cars/{carId}/images/{imageId}")
-@delete
-@summary("Delete Image")
-op deleteImage(...Parameters.carId, ...Parameters.imageId):
-  | NoContentResponse
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @post
+    op createImage(
+      ...Parameters.carId,
+      @body body: CreateImagePayload,
+    ): (CreatedResponse &
+      Body<Image>) | BadRequestResponse | UnauthorizedResponse;
 
-/**
- * Get a image
- */
-@tag("image")
-@route("/cars/{carId}/images/{imageId}")
-@get
-@summary("Get Image")
-op getImage(...Parameters.carId, ...Parameters.imageId):
-  | Image
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @patch(#{ implicitOptionality: true })
+    op updateImage(
+      ...Parameters.carId,
+      ...Parameters.imageId,
+      @body body: UpdateImagePayload,
+    ):
+      | (OkResponse & Body<Image>)
+      | NotFoundResponse
+      | BadRequestResponse
+      | UnauthorizedResponse;
 
-/**
- * Update a image
- */
-@tag("image")
-@route("/cars/{carId}/images/{imageId}")
-@patch
-@summary("Update Image")
-op updateImage(
-  ...Parameters.carId,
-  ...Parameters.imageId,
-  @body body: UpdateImage,
-):
-  | Image
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @delete
+    op deleteImage(
+      ...Parameters.carId,
+      ...Parameters.imageId,
+    ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
+  }
 
-/**
- * Get prices
- */
-@tag("price")
-@route("/cars/{carId}/prices")
-@get
-@summary("Get Pricess")
-op getPrices(...Parameters.carId): Body<Price[]> | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+  @route("/{carId}/prices")
+  namespace Prices {
+    @get
+    op listPrices(...Parameters.carId): (OkResponse &
+      Body<Price[]>) | UnauthorizedResponse;
 
-/**
- * Create a price
- */
-@tag("price")
-@route("/cars/{carId}/prices")
-@post
-@summary("Create Price")
-op createPrice(...Parameters.carId, @body body: CreatePrice): (CreatedResponse &
-  Price) | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+    @get
+    op getPrice(...Parameters.carId, ...Parameters.priceId): (OkResponse &
+      Body<Price>) | NotFoundResponse | UnauthorizedResponse;
 
-/**
- * Delete a price
- */
-@tag("price")
-@route("/cars/{carId}/prices/{priceId}")
-@delete
-@summary("Delete Price")
-op deletePrice(...Parameters.carId, ...Parameters.priceId):
-  | NoContentResponse
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @post
+    op createPrice(
+      ...Parameters.carId,
+      @body body: CreatePricePayload,
+    ): (CreatedResponse &
+      Body<Price>) | BadRequestResponse | UnauthorizedResponse;
 
-/**
- * Get a price
- */
-@tag("price")
-@route("/cars/{carId}/prices/{priceId}")
-@get
-@summary("Get Price")
-op getPrice(...Parameters.carId, ...Parameters.priceId):
-  | Price
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @patch(#{ implicitOptionality: true })
+    op updatePrice(
+      ...Parameters.carId,
+      ...Parameters.priceId,
+      @body body: UpdatePricePayload,
+    ):
+      | (OkResponse & Body<Price>)
+      | NotFoundResponse
+      | BadRequestResponse
+      | UnauthorizedResponse;
 
-/**
- * Update a price
- */
-@tag("price")
-@route("/cars/{carId}/prices/{priceId}")
-@patch
-@summary("Update Price")
-op updatePrice(
-  ...Parameters.carId,
-  ...Parameters.priceId,
-  @body body: UpdatePrice,
-):
-  | Price
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @delete
+    op deletePrice(
+      ...Parameters.carId,
+      ...Parameters.priceId,
+    ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
+  }
+}
 
-/**
- * Get attributes
- */
-@tag("attribute")
 @route("/attributes")
-@get
-@summary("Get Attribute")
-op getAttributes(): Body<Attribute[]> | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+namespace Attributes {
+  @get
+  op listAttributes(): (OkResponse & Body<Attribute[]>) | UnauthorizedResponse;
 
-/**
- * Create an attributes
- */
-@tag("attribute")
-@route("/attributes")
-@post
-@summary("Create Attribute")
-op createAttribute(@body body: CreateAttribute): (CreatedResponse &
-  Attribute) | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+  @get
+  op getAttribute(...Parameters.attributeId): (OkResponse &
+    Body<Attribute>) | NotFoundResponse | UnauthorizedResponse;
 
-/**
- * Delete an attribute
- */
-@tag("attribute")
-@route("/attributes/{attributeId}")
-@delete
-@summary("Delete Attribute")
-op deleteAttribute(...Parameters.attributeId):
-  | NoContentResponse
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+  @post
+  op createAttribute(@body body: CreateAttributePayload): (CreatedResponse &
+    Body<Attribute>) | BadRequestResponse | UnauthorizedResponse;
 
-/**
- * Get an attribute
- */
-@tag("attribute")
-@route("/attributes/{attributeId}")
-@get
-@summary("Get Attribute")
-op getAttribute(...Parameters.attributeId):
-  | Attribute
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+  @patch(#{ implicitOptionality: true })
+  op updateAttribute(
+    ...Parameters.attributeId,
+    @body body: UpdateAttributePayload,
+  ):
+    | (OkResponse & Body<Attribute>)
+    | NotFoundResponse
+    | BadRequestResponse
+    | UnauthorizedResponse;
 
-/**
- * Update an attribute
- */
-@tag("attribute")
-@route("/attributes/{attributeId}")
-@patch
-@summary("Update Attribute")
-op updateAttribute(...Parameters.attributeId, @body body: UpdateAttribute):
-  | Attribute
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+  @delete
+  op deleteAttribute(
+    ...Parameters.attributeId,
+  ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
 
-/**
- * Get attribute choices
- */
-@tag("attribute_choice")
-@route("/attributes/{attributeId}/choices")
-@get
-@summary("Get Attribute Choices")
-op getAttributeChoices(
-  ...Parameters.attributeId,
-): Body<AttributeChoice[]> | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+  @route("/attributes/{attributeId}/choices")
+  namespace Choices {
+    @get
+    op listChoices(...Parameters.attributeId): (OkResponse &
+      Body<Choice[]>) | UnauthorizedResponse;
 
-/**
- * Create an attribute choice
- */
-@tag("attribute_choice")
-@route("/attributes/{attributeId}/choices")
-@post
-@summary("Create Attribute Choice")
-op createAttributeChoice(
-  ...Parameters.attributeId,
-  @body body: CreateAttributeChoice,
-): (CreatedResponse & AttributeChoice) | UnauthorizedResponse | {
-  @statusCode statusCode: 500;
-};
+    @get
+    op getChoice(
+      ...Parameters.attributeId,
+      ...Parameters.choiceId,
+    ): (OkResponse & Body<Choice>) | NotFoundResponse | UnauthorizedResponse;
 
-/**
- * Delete an attribute choice
- */
-@tag("attribute_choice")
-@route("/attributes/{attributeId}/choices/{choiceId}")
-@delete
-@summary("Delete Attribute Choice")
-op deleteAttributeChoice(...Parameters.attributeId, ...Parameters.choiceId):
-  | NoContentResponse
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @post
+    op createChoice(
+      ...Parameters.attributeId,
+      @body body: CreateChoicePayload,
+    ): (CreatedResponse &
+      Body<Choice>) | BadRequestResponse | UnauthorizedResponse;
 
-/**
- * Get an attribute choice
- */
-@tag("attribute_choice")
-@route("/attributes/{attributeId}/choices/{choiceId}")
-@get
-@summary("Get Attribute Choice")
-op getAttributeChoice(...Parameters.attributeId, ...Parameters.choiceId):
-  | AttributeChoice
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
+    @patch(#{ implicitOptionality: true })
+    op updateChoice(
+      ...Parameters.attributeId,
+      ...Parameters.choiceId,
+      @body body: UpdateChoicePayload,
+    ):
+      | (OkResponse & Body<Choice>)
+      | NotFoundResponse
+      | BadRequestResponse
+      | UnauthorizedResponse;
 
-/**
- * Update an attribute choice
- */
-@tag("attribute_choice")
-@route("/attributes/{attributeId}/choices/{choiceId}")
-@patch
-@summary("Update Attribute Choice")
-op updateAttributeChoice(
-  ...Parameters.attributeId,
-  ...Parameters.choiceId,
-  @body body: UpdateAttributeChoice,
-):
-  | AttributeChoice
-  | UnauthorizedResponse
-  | NotFoundResponse
-  | {
-      @statusCode statusCode: 500;
-    };
-
-namespace Parameters {
-  model carId {
-    /**
-     * Car ID
-     */
-    @format("uuid") @path carId: string;
-  }
-  model imageId {
-    /**
-     * Image ID
-     */
-    @format("uuid") @path imageId: string;
-  }
-  model priceId {
-    /**
-     * Price ID
-     */
-    @format("uuid") @path priceId: string;
-  }
-  model attributeId {
-    /**
-     * Attribute ID
-     */
-    @format("uuid") @path attributeId: string;
-  }
-  model choiceId {
-    /**
-     * Choice ID
-     */
-    @format("uuid") @path choiceId: string;
+    @delete
+    op deleteChoice(
+      ...Parameters.attributeId,
+      ...Parameters.choiceId,
+    ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
   }
 }
