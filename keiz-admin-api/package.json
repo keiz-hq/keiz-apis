@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "tsp compile ."
+    "build": "tsp compile .",
+    "preview": "redocly preview -d ./tsp-output/schema/ -p 4041"
   },
   "dependencies": {
     "@typespec/compiler": "latest",
@@ -12,5 +13,8 @@
     "@typespec/rest": "latest",
     "@typespec/openapi": "latest",
     "@typespec/openapi3": "latest"
+  },
+  "devDependencies": {
+    "@redocly/cli": "latest"
   }
 }
