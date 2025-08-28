@@ -130,7 +130,7 @@ model CreateCar {
   price: CreatePricePayload;
 
   @doc("アフターサービス")
-  after_service: AfterService;
+  after_service: CreateAfterServicePayload;
 
   @doc("Webサイト情報")
   website: Website;
