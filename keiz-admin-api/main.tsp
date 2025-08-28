@@ -165,7 +165,7 @@ namespace Attributes {
     ...Parameters.attributeId,
   ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
 
-  @route("/attributes/{attributeId}/choices")
+  @route("/{attributeId}/choices")
   namespace Choices {
     @get
     op list(...Parameters.attributeId): (OkResponse &
