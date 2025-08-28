@@ -1,12 +1,25 @@
 model Choice {
   id: uuid;
-  name: string;
+
+  @doc("Key (snake_case)")
+  key: string;
+
+  @doc("表示名")
+  display_name_ja: string;
 }
 
 model CreateChoicePayload {
-  name: string;
+  @doc("Key (snake_case)")
+  key: string;
+
+  @doc("表示名")
+  display_name_ja: string;
 }
 
 model UpdateChoicePayload {
-  name?: string;
+  @doc("Key (snake_case)")
+  key?: string;
+
+  @doc("表示名")
+  display_name_ja?: string;
 }

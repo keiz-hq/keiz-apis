@@ -1,0 +1,31 @@
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+  build:
+    deps:
+      - build-admin-api
+      - build-web-api
+  build-admin-api:
+    dir: ./keiz-admin-api
+    cmds:
+      - pnpm build
+  build-web-api:
+    dir: ./keiz-web-api
+    cmds:
+      - pnpm build
+  preview:
+    deps:
+      - preview-admin-api
+      - preview-web-api
+  preview-admin-api:
+    dir: ./keiz-admin-api
+    cmds:
+      - pnpm preview
+  preview-web-api:
+    dir: ./keiz-web-api
+    cmds:
+      - pnpm preview

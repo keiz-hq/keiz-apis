@@ -6,6 +6,9 @@ model Attribute {
 
   @doc("表示名")
   display_name_ja: string;
+
+  @doc("選択肢")
+  choices: Choice[];
 }
 
 model CreateAttributePayload {
