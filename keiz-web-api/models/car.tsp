@@ -38,7 +38,7 @@ model Car {
   fuel_type: Choice;
 
   @doc("装備")
-  accessaries: Choice[];
+  accessories: Choice[];
 
   @doc("走行距離 (km)")
   mileage: uint32;
