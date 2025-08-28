@@ -10,9 +10,6 @@ model Car {
   @doc("グレード名")
   grade_name: string;
 
-  @doc("装備")
-  accessaries: Choice[];
-
   @doc("ボディタイプ")
   body_type: Choice;
 
@@ -26,7 +23,7 @@ model Car {
   doors: uint32;
 
   @doc("ハンドル位置")
-  handle_position?: Choice;
+  handle_position: Choice;
 
   @doc("排気量 (cc)")
   displacement: uint32;
@@ -39,6 +36,9 @@ model Car {
 
   @doc("燃料")
   fuel_type: Choice;
+
+  @doc("装備")
+  accessaries: Choice[];
 
   @doc("走行距離 (km)")
   mileage: uint32;
@@ -55,12 +55,18 @@ model Car {
   @doc("コスト")
   cost: Cost;
 
+  @doc("価格")
+  prices: Price[];
+
+  @doc("画像")
+  images: Image[];
+
   @doc("アフターサービス")
   after_service: AfterService;
 
-  @doc("メタデータ")
-  metadata: Metadata;
-
   @doc("Webサイト情報")
   website: Website;
+
+  @doc("メタデータ")
+  metadata: Metadata;
 }

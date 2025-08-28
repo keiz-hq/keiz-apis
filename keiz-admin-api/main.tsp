@@ -40,49 +40,54 @@ namespace KeizAdminAPI;
 @route("/cars")
 namespace Cars {
   @get
-  op listCars(
+  op list(
     @query(#{ explode: true }) filter?: "lined_up" | "recommended",
   ): (OkResponse & Body<Car[]>) | UnauthorizedResponse;
 
   @get
-  op getCar(...Parameters.carId): (OkResponse &
+  op get(...Parameters.carId): (OkResponse &
     Body<Car>) | NotFoundResponse | UnauthorizedResponse;
 
   @post
-  op createCar(@body body: CreateCar): (CreatedResponse &
+  op create(@body body: CreateCar): (CreatedResponse &
     Body<Car>) | BadRequestResponse;
 
   @patch(#{ implicitOptionality: true })
-  op updateCar(...Parameters.carId, @body body: UpdateCar):
+  op update(...Parameters.carId, @body body: UpdateCar):
     | (OkResponse & Body<Car>)
     | NotFoundResponse
     | BadRequestResponse
     | UnauthorizedResponse;
 
   @delete
-  op deleteCar(
+  op delete(
     ...Parameters.carId,
   ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
+
+  @route("/{carId}/sold")
+  @patch(#{ implicitOptionality: true })
+  op sold(...Parameters.carId, @query sold: boolean): (OkResponse &
+    Body<Car>) | NotFoundResponse | UnauthorizedResponse;
 
   @route("/{carId}/images")
   namespace Images {
     @get
-    op listImages(...Parameters.carId): (OkResponse &
+    op list(...Parameters.carId): (OkResponse &
       Body<Image[]>) | UnauthorizedResponse;
 
     @get
-    op getImage(...Parameters.carId, ...Parameters.imageId): (OkResponse &
+    op get(...Parameters.carId, ...Parameters.imageId): (OkResponse &
       Body<Image>) | NotFoundResponse | UnauthorizedResponse;
 
     @post
-    op createImage(
+    op create(
       ...Parameters.carId,
       @body body: CreateImagePayload,
     ): (CreatedResponse &
       Body<Image>) | BadRequestResponse | UnauthorizedResponse;
 
     @patch(#{ implicitOptionality: true })
-    op updateImage(
+    op update(
       ...Parameters.carId,
       ...Parameters.imageId,
       @body body: UpdateImagePayload,
@@ -93,7 +98,7 @@ namespace Cars {
       | UnauthorizedResponse;
 
     @delete
-    op deleteImage(
+    op delete(
       ...Parameters.carId,
       ...Parameters.imageId,
     ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
@@ -102,22 +107,22 @@ namespace Cars {
   @route("/{carId}/prices")
   namespace Prices {
     @get
-    op listPrices(...Parameters.carId): (OkResponse &
+    op list(...Parameters.carId): (OkResponse &
       Body<Price[]>) | UnauthorizedResponse;
 
     @get
-    op getPrice(...Parameters.carId, ...Parameters.priceId): (OkResponse &
+    op get(...Parameters.carId, ...Parameters.priceId): (OkResponse &
       Body<Price>) | NotFoundResponse | UnauthorizedResponse;
 
     @post
-    op createPrice(
+    op create(
       ...Parameters.carId,
       @body body: CreatePricePayload,
     ): (CreatedResponse &
       Body<Price>) | BadRequestResponse | UnauthorizedResponse;
 
     @patch(#{ implicitOptionality: true })
-    op updatePrice(
+    op update(
       ...Parameters.carId,
       ...Parameters.priceId,
       @body body: UpdatePricePayload,
@@ -128,7 +133,7 @@ namespace Cars {
       | UnauthorizedResponse;
 
     @delete
-    op deletePrice(
+    op delete(
       ...Parameters.carId,
       ...Parameters.priceId,
     ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
@@ -138,52 +143,47 @@ namespace Cars {
 @route("/attributes")
 namespace Attributes {
   @get
-  op listAttributes(): (OkResponse & Body<Attribute[]>) | UnauthorizedResponse;
+  op list(): (OkResponse & Body<Attribute[]>) | UnauthorizedResponse;
 
   @get
-  op getAttribute(...Parameters.attributeId): (OkResponse &
+  op get(...Parameters.attributeId): (OkResponse &
     Body<Attribute>) | NotFoundResponse | UnauthorizedResponse;
 
   @post
-  op createAttribute(@body body: CreateAttributePayload): (CreatedResponse &
+  op create(@body body: CreateAttributePayload): (CreatedResponse &
     Body<Attribute>) | BadRequestResponse | UnauthorizedResponse;
 
   @patch(#{ implicitOptionality: true })
-  op updateAttribute(
-    ...Parameters.attributeId,
-    @body body: UpdateAttributePayload,
-  ):
+  op update(...Parameters.attributeId, @body body: UpdateAttributePayload):
     | (OkResponse & Body<Attribute>)
     | NotFoundResponse
     | BadRequestResponse
     | UnauthorizedResponse;
 
   @delete
-  op deleteAttribute(
+  op delete(
     ...Parameters.attributeId,
   ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;
 
   @route("/attributes/{attributeId}/choices")
   namespace Choices {
     @get
-    op listChoices(...Parameters.attributeId): (OkResponse &
+    op list(...Parameters.attributeId): (OkResponse &
       Body<Choice[]>) | UnauthorizedResponse;
 
     @get
-    op getChoice(
-      ...Parameters.attributeId,
-      ...Parameters.choiceId,
-    ): (OkResponse & Body<Choice>) | NotFoundResponse | UnauthorizedResponse;
+    op get(...Parameters.attributeId, ...Parameters.choiceId): (OkResponse &
+      Body<Choice>) | NotFoundResponse | UnauthorizedResponse;
 
     @post
-    op createChoice(
+    op create(
       ...Parameters.attributeId,
       @body body: CreateChoicePayload,
     ): (CreatedResponse &
       Body<Choice>) | BadRequestResponse | UnauthorizedResponse;
 
     @patch(#{ implicitOptionality: true })
-    op updateChoice(
+    op update(
       ...Parameters.attributeId,
       ...Parameters.choiceId,
       @body body: UpdateChoicePayload,
@@ -194,7 +194,7 @@ namespace Attributes {
       | UnauthorizedResponse;
 
     @delete
-    op deleteChoice(
+    op delete(
       ...Parameters.attributeId,
       ...Parameters.choiceId,
     ): NoContentResponse | NotFoundResponse | UnauthorizedResponse;

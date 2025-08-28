@@ -38,9 +38,9 @@ namespace KeizWebAPI;
 @route("/cars")
 namespace Cars {
   @get
-  op getCars(@query(#{ explode: true }) recommended?: boolean): OkResponse &
+  op list(@query(#{ explode: true }) recommended?: boolean): OkResponse &
     Body<Car[]>;
 
   @get
-  op getCar(...Parameters.carId): (OkResponse & Car) | NotFoundResponse;
+  op get(...Parameters.carId): (OkResponse & Car) | NotFoundResponse;
 }
