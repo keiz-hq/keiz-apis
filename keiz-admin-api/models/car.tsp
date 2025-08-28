@@ -109,7 +109,7 @@ model CreateCar {
   fuel_type_id: uuid;
 
   @doc("装備; Choice IDs")
-  accessary_ids: uuid[];
+  accessory_ids: uuid[];
 
   @doc("走行距離 (km)")
   mileage: uint32;
@@ -174,7 +174,7 @@ model UpdateCar {
   fuel_type_id?: uuid;
 
   @doc("装備; Choice IDs")
-  accessary_ids?: uuid[];
+  accessory_ids?: uuid[];
 
   @doc("走行距離 (km)")
   mileage?: uint32;
