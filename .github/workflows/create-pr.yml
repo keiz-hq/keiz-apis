@@ -33,7 +33,7 @@ jobs:
         include:
           - repo: keiz-admin-web
             type: app
-            schema: openapi.KeizAdminWeb.yaml
+            schema: openapi.KeizAdminAPI.yaml
           - repo: keiz-web
             type: app
             schema: openapi.KeizWebAPI.yaml
