@@ -57,7 +57,7 @@ namespace KeizAdminAPI {
     @delete delete(@path id: uuid): NoContentResponse;
   }
 
-  @route("/{carId}/sold")
+  @route("/cars/{carId}/sold")
   @tag("Cars")
   interface Sold {
     @patch(#{ implicitOptionality: true }) sold(
@@ -69,7 +69,7 @@ namespace KeizAdminAPI {
       }>;
   }
 
-  @route("/{carId}/images")
+  @route("/cars/{carId}/images")
   @tag("Images")
   interface Images {
     @get list(@path carId: uuid): OkResponse &
@@ -100,7 +100,7 @@ namespace KeizAdminAPI {
     @delete delete(@path carId: uuid, @path id: uuid): NoContentResponse;
   }
 
-  @route("/{carId}/prices")
+  @route("/cars/{carId}/prices")
   @tag("Prices")
   interface Prices {
     @get list(@path carId: uuid): OkResponse &
@@ -161,7 +161,7 @@ namespace KeizAdminAPI {
     @delete delete(@path id: uuid): NoContentResponse;
   }
 
-  @route("/{attributeId}/choices")
+  @route("/attributes/{attributeId}/choices")
   @tag("Choices")
   interface Choices {
     @get list(@path attributeId: uuid): OkResponse &
