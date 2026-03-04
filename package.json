@@ -1,0 +1,24 @@
+{
+  "name": "dotto-typespec",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/openapi": "latest",
+    "@typespec/openapi3": "latest",
+    "@typespec/rest": "latest"
+  },
+  "devDependencies": {
+    "@redocly/cli": "latest"
+  },
+  "scripts": {
+    "compile": "tsp compile .",
+    "watch": "tsp compile . --watch",
+    "preview": "redocly preview --project-dir=./tsp-output/schema/",
+    "build-docs:keiz-admin-api": "redocly build-docs keiz-admin-api -o ./dist/keiz-admin-api.html",
+    "build-docs:keiz-web-api": "redocly build-docs keiz-web-api -o ./dist/keiz-web-api.html"
+  }
+}

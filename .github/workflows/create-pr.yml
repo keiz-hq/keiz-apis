@@ -1,0 +1,120 @@
+name: Create PR on Schema Change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "main.tsp"
+      - "tspconfig.yaml"
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: jdx/mise-action@v3
+      - name: Install
+        run: task install
+      - name: Compile
+        run: task compile
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schemas
+          path: tsp-output/schema/
+
+  create-pr:
+    needs: compile
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - repo: keiz-admin-web
+            type: app
+            schema: openapi.KeizAdminWeb.yaml
+          - repo: keiz-web
+            type: app
+            schema: openapi.KeizWebAPI.yaml
+          - repo: keiz-admin-api
+            type: backend
+            schema: openapi.KeizAdminAPI.yaml
+          - repo: keiz-web-api
+            type: backend
+            schema: openapi.KeizWebAPI.yaml
+    steps:
+      - uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.KEIZ_API_SCHEMA_UPDATER_APP_ID }}
+          private-key: ${{ secrets.KEIZ_API_SCHEMA_UPDATER_APP_PRIVATE_KEY }}
+          owner: keiz-hq
+          repositories: ${{ matrix.repo }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: schemas
+          path: schemas
+      - name: Check if branch and PR exist
+        id: check-existing
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          # Check if branch exists
+          exit_code=0
+          git ls-remote --exit-code --heads https://x-access-token:${GH_TOKEN}@github.com/keiz-hq/${{ matrix.repo }}.git update-openapi-schema || exit_code=$?
+
+          if [ $exit_code -eq 0 ]; then
+            echo "branch_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "branch_exists=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Check if PR exists
+          pr_count=$(gh pr list --repo keiz-hq/${{ matrix.repo }} --head update-openapi-schema --base main --state open --json number --jq 'length')
+          if [ "$pr_count" -gt 0 ]; then
+            echo "pr_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "pr_exists=false" >> $GITHUB_OUTPUT
+          fi
+      - uses: actions/checkout@v6
+        with:
+          repository: keiz-hq/${{ matrix.repo }}
+          token: ${{ steps.app-token.outputs.token }}
+          path: target-repo
+          ref: ${{ steps.check-existing.outputs.branch_exists == 'true' && steps.check-existing.outputs.pr_exists == 'true' && 'update-openapi-schema' || '' }}
+      - name: Copy schemas
+        run: |
+          if [ -z "${{ matrix.schema }}" ]; then
+            echo "Error: matrix.schema is required"
+            exit 1
+          fi
+
+          mkdir -p target-repo/openapi
+          cp schemas/${{ matrix.schema }} target-repo/openapi/openapi.yaml
+      - name: Push to existing branch
+        if: steps.check-existing.outputs.branch_exists == 'true' && steps.check-existing.outputs.pr_exists == 'true'
+        working-directory: target-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update OpenAPI schema from keiz-apis"
+            git push
+          fi
+      - uses: peter-evans/create-pull-request@v7
+        if: steps.check-existing.outputs.branch_exists != 'true' || steps.check-existing.outputs.pr_exists != 'true'
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          path: target-repo
+          branch: update-openapi-schema
+          draft: true
+          title: "Update OpenAPI schema"
+          body: |
+            This PR updates the OpenAPI schema from [keiz-apis](https://github.com/keiz-hq/keiz-apis).
+
+            Triggered by: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+          commit-message: "Update OpenAPI schema from keiz-apis"

@@ -1,0 +1,5 @@
+apis:
+  keiz-admin-api:
+    root: ./tsp-output/schema/openapi.KeizAdminAPI.yaml
+  keiz-web-api:
+    root: ./tsp-output/schema/openapi.KeizWebAPI.yaml

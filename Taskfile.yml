@@ -1,31 +1,62 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
 version: "3"
+
+vars:
+  PNPM: pnpm
 
 tasks:
   default:
     cmds:
-      - task --list-all
-    silent: true
-  build:
-    deps:
-      - build-admin-api
-      - build-web-api
-  build-admin-api:
-    dir: ./keiz-admin-api
+      - task --list
+  install:
+    desc: Install dependencies
     cmds:
-      - pnpm build
-  build-web-api:
-    dir: ./keiz-web-api
+      - "{{.PNPM}} install"
+  compile:
+    desc: Compile TypeSpec to OpenAPI schema
     cmds:
-      - pnpm build
+      - "{{.PNPM}} compile"
+  watch:
+    desc: Watch for changes and compile
+    cmds:
+      - "{{.PNPM}} watch"
   preview:
+    desc: Preview the documentation
+    cmds:
+      - "{{.PNPM}} preview"
+  watch-and-preview:
+    desc: Watch for changes and preview the documentation
     deps:
-      - preview-admin-api
-      - preview-web-api
-  preview-admin-api:
-    dir: ./keiz-admin-api
+      - task: watch
+      - task: preview
+  build:
+    desc: Clean and build the documentation
     cmds:
-      - pnpm preview
-  preview-web-api:
-    dir: ./keiz-web-api
+      - task: clean
+      - task: compile-and-build-docs
+  compile-and-build-docs:
     cmds:
-      - pnpm preview
+      - task: compile
+      - task: build-docs
+  build-docs:
+    deps:
+      - task: build-docs:keiz-admin-api
+      - task: build-docs:keiz-web-api
+  build-docs:keiz-admin-api:
+    cmds:
+      - "{{.PNPM}} build-docs:keiz-admin-api"
+  build-docs:keiz-web-api:
+    cmds:
+      - "{{.PNPM}} build-docs:keiz-web-api"
+  clean:
+    desc: Clean the schema and documentation
+    deps:
+      - task: clean-schema
+      - task: clean-docs
+  clean-schema:
+    cmds:
+      - rm -rf ./tsp-output/schema
+  clean-docs:
+    cmds:
+      - rm -rf ./dist
