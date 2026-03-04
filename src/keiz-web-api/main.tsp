@@ -34,7 +34,7 @@ namespace KeizWebAPI {
         cars: Car[];
       }>;
 
-    @get detail(@path id: uuid): OkResponse &
+    @get detail(@path carId: uuid): OkResponse &
       Body<{
         car: Car;
       }>;

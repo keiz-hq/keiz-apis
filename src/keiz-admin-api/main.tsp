@@ -36,7 +36,7 @@ namespace KeizAdminAPI {
         cars: Car[];
       }>;
 
-    @get detail(@path id: uuid): OkResponse &
+    @get detail(@path carId: uuid): OkResponse &
       Body<{
         car: Car;
       }>;
@@ -47,14 +47,14 @@ namespace KeizAdminAPI {
       }>;
 
     @patch(#{ implicitOptionality: true }) update(
-      @path id: uuid,
+      @path carId: uuid,
       @body body: UpdateCar,
     ): OkResponse &
       Body<{
         car: Car;
       }>;
 
-    @delete delete(@path id: uuid): NoContentResponse;
+    @delete delete(@path carId: uuid): NoContentResponse;
   }
 
   @route("/cars/{carId}/sold")
@@ -77,7 +77,7 @@ namespace KeizAdminAPI {
         images: Image[];
       }>;
 
-    @get detail(@path carId: uuid, @path id: uuid): OkResponse &
+    @get detail(@path carId: uuid, @path imageId: uuid): OkResponse &
       Body<{
         image: Image;
       }>;
@@ -90,14 +90,14 @@ namespace KeizAdminAPI {
 
     @patch(#{ implicitOptionality: true }) update(
       @path carId: uuid,
-      @path id: uuid,
+      @path imageId: uuid,
       @body body: UpdateImagePayload,
     ): OkResponse &
       Body<{
         image: Image;
       }>;
 
-    @delete delete(@path carId: uuid, @path id: uuid): NoContentResponse;
+    @delete delete(@path carId: uuid, @path imageId: uuid): NoContentResponse;
   }
 
   @route("/cars/{carId}/prices")
@@ -108,7 +108,7 @@ namespace KeizAdminAPI {
         prices: Price[];
       }>;
 
-    @get detail(@path carId: uuid, @path id: uuid): OkResponse &
+    @get detail(@path carId: uuid, @path priceId: uuid): OkResponse &
       Body<{
         price: Price;
       }>;
@@ -121,14 +121,14 @@ namespace KeizAdminAPI {
 
     @patch(#{ implicitOptionality: true }) update(
       @path carId: uuid,
-      @path id: uuid,
+      @path priceId: uuid,
       @body body: UpdatePricePayload,
     ): OkResponse &
       Body<{
         price: Price;
       }>;
 
-    @delete delete(@path carId: uuid, @path id: uuid): NoContentResponse;
+    @delete delete(@path carId: uuid, @path priceId: uuid): NoContentResponse;
   }
 
   @route("/attributes")
@@ -139,7 +139,7 @@ namespace KeizAdminAPI {
         attributes: Attribute[];
       }>;
 
-    @get detail(@path id: uuid): OkResponse &
+    @get detail(@path attributeId: uuid): OkResponse &
       Body<{
         attribute: Attribute;
       }>;
@@ -151,14 +151,14 @@ namespace KeizAdminAPI {
       }>;
 
     @patch(#{ implicitOptionality: true }) update(
-      @path id: uuid,
+      @path attributeId: uuid,
       @body body: UpdateAttributePayload,
     ): OkResponse &
       Body<{
         attribute: Attribute;
       }>;
 
-    @delete delete(@path id: uuid): NoContentResponse;
+    @delete delete(@path attributeId: uuid): NoContentResponse;
   }
 
   @route("/attributes/{attributeId}/choices")
@@ -169,7 +169,7 @@ namespace KeizAdminAPI {
         choices: Choice[];
       }>;
 
-    @get detail(@path attributeId: uuid, @path id: uuid): OkResponse &
+    @get detail(@path attributeId: uuid, @path choiceId: uuid): OkResponse &
       Body<{
         choice: Choice;
       }>;
@@ -185,13 +185,16 @@ namespace KeizAdminAPI {
 
     @patch(#{ implicitOptionality: true }) update(
       @path attributeId: uuid,
-      @path id: uuid,
+      @path choiceId: uuid,
       @body body: UpdateChoicePayload,
     ): OkResponse &
       Body<{
         choice: Choice;
       }>;
 
-    @delete delete(@path attributeId: uuid, @path id: uuid): NoContentResponse;
+    @delete delete(
+      @path attributeId: uuid,
+      @path choiceId: uuid,
+    ): NoContentResponse;
   }
 }
